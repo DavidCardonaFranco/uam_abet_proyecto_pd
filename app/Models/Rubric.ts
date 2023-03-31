@@ -1,5 +1,6 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, ManyToMany, column, manyToMany } from '@ioc:Adonis/Lucid/Orm'
+import Indicator from './Indicator'
 
 export default class Rubric extends BaseModel {
   @column({ isPrimary: true })
@@ -16,4 +17,11 @@ export default class Rubric extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
+
+  @manyToMany(() => Indicator, {
+    pivotTable: 'indicators_rubrics',
+    pivotForeignKey: 'id_rubric',
+    pivotRelatedForeignKey: 'id_indicator',
+  })
+  public indicators: ManyToMany<typeof Indicator>
 }
