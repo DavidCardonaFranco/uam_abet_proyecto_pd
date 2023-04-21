@@ -5,6 +5,9 @@ import Proffesor from './Proffesor'
 
 export default class Subject extends BaseModel {
   @column({ isPrimary: true })
+  public id: number
+
+  @column()
   public code: number
 
   @column()

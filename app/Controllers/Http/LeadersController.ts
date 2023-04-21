@@ -1,4 +1,3 @@
-import { Encryption } from '@adonisjs/core/build/standalone';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Leader from 'App/Models/Leader'
 
@@ -37,7 +36,7 @@ export default class LeadersController {
         const theLeader = await Leader.findOrFail(params.id);
         theLeader.name=body.name;
         theLeader.email=body.email;
-        theLeader.passwords=body.passwords;
+        theLeader.password=body.password;
         return theLeader.save();
     }
     /**

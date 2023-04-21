@@ -19,10 +19,10 @@ export default class Activity extends BaseModel {
   public end_date: Date
 
   @column()
-  public subject_code: number
+  public subject_id: number
 
   @hasOne(() => Subject, {
-    foreignKey: 'subject_code',
+    foreignKey: 'subject_id',
   })
   public subject: HasOne<typeof Subject>
 

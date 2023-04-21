@@ -1,16 +1,14 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'activities'
+  protected tableName = 'indicators_rubrics'
 
   public async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.increments('id')
-      table.string('name')
-      table.string('description')
-      table.date('start_date')
-      table.date('end_date')
-      table.integer('subject_id').unsigned().references('subjects.id')
+      table.integer('id_rubric').unsigned().references('id').inTable('rubrics')
+      table.integer('id_indicator').unsigned().references('id').inTable('indicators')
+      table.unique(['id_rubric', 'id_indicator'])
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

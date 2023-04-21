@@ -1,14 +1,14 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'subjects'
+  protected tableName = 'rubrics'
 
   public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('code')
-      table.string('name')
-      table.string('description')
-      table.tinyint('credits ')
+      table.increments('id'),
+      table.string('name', 255).notNullable(),
+      table.string('description', 255).notNullable()
+
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

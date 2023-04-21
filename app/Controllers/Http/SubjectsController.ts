@@ -16,8 +16,9 @@ export default class SubjectsController {
     public async store({request}:HttpContextContract){
         const body=request.body();
         //Si se tiene un nombre, sobreescribe la información
+        body.code = body.code;
         body.name = body.name;
-        body.decription = body.decription;
+        body.description = body.description;
         body.credits = body.credits;
         const newSubject = await Subject.create(body);
         return newSubject;
@@ -36,8 +37,8 @@ export default class SubjectsController {
         const body=request.body();
         const theSubject = await Subject.findOrFail(params.code);
         theSubject.name=body.name;
-        theSubject.decription=body.decription;
-        theSubject.creditss=body.creditss;
+        theSubject.description=body.description;
+        theSubject.credits=body.credits;
         return theSubject.save();
     }
     /**

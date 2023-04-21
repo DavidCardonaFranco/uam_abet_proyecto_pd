@@ -1,14 +1,15 @@
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
-  protected tableName = 'proffesors_subjects'
+  protected tableName = 'subjects'
 
-  public async up() {
+  public async up () {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
-      table.integer('proffesor_id').unsigned().references('proffesors.id')
-      table.integer('subject_code').unsigned().references('subject.code')
-      table.unique(['proffesor_id', 'subject_code'])
+      table.increments('id').primary()
+      table.integer('code')
+      table.string('name')
+      table.string('description')
+      table.tinyint('credits ')
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */
@@ -17,7 +18,7 @@ export default class extends BaseSchema {
     })
   }
 
-  public async down() {
+  public async down () {
     this.schema.dropTable(this.tableName)
   }
 }

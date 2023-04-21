@@ -9,7 +9,7 @@ export default class OutcomeSubject extends BaseModel {
   public id_outcome: number
 
   @column()
-  public id_subject: number
+  public subject_id: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

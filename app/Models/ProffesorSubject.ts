@@ -9,7 +9,7 @@ export default class ProffesorSubject extends BaseModel {
   public proffesor_id: number
 
   @column()
-  public subject_code: number
+  public subject_id: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

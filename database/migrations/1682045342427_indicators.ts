@@ -25,7 +25,7 @@ export default class extends BaseSchema {
           'Outstanding',
         ])
         .notNullable()
-      table.integer('id_outcome').unsigned().references('studenst_outcomes.id')
+      table.integer('id_outcome').unsigned().references('id').inTable('students_outcomes').notNullable()
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

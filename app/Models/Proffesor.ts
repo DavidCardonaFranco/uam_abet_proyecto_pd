@@ -24,7 +24,7 @@ export default class Proffesor extends BaseModel {
   @manyToMany(() => Subject, {
     pivotTable: 'proffesors_subjects',
     pivotForeignKey: 'proffesor_id',
-    pivotRelatedForeignKey: 'subject_code',
+    pivotRelatedForeignKey: 'subject_id',
   })
   public subjects: ManyToMany<typeof Subject>
 }

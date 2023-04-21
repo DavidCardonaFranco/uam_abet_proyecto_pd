@@ -1,17 +1,16 @@
-import { Encryption } from '@adonisjs/core/build/standalone';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Evaluation from 'App/Models/Evaluation'
+import Proffesor from 'App/Models/Proffesor'
 
 
-export default class EvaluationsController {
+export default class ProffesorsController {
     /**
-     * Lista todos los Evaluations
+     * Lista todos los Proffesors
      */
     public async index(ctx: HttpContextContract) {
-        return Evaluation.all();
+        return Proffesor.all();
     }
     /**
-     * Almacena la información de un Evaluation
+     * Almacena la información de un Proffesor
      */
     public async store({request}:HttpContextContract){
         const body=request.body();
@@ -19,32 +18,32 @@ export default class EvaluationsController {
         body.name = body.name;
         body.email = body.email;
         body.password = body.password;
-        const newEvaluation = await Evaluation.create(body);
-        return newEvaluation;
+        const newProffesor = await Proffesor.create(body);
+        return newProffesor;
     }
     /**
-     * Muestra la información de un solo Evaluation
+     * Muestra la información de un solo Proffesor
      */
     public async show({params}:HttpContextContract) {
-        return Evaluation.findOrFail(params.id);
+        return Proffesor.findOrFail(params.id);
     }
     /**
-     * Actualiza la información de un Evaluation basado
+     * Actualiza la información de un Proffesor basado
      * en el identificador y nuevos parámetros
      */
     public async update({params,request}:HttpContextContract) {
         const body=request.body();
-        const theEvaluation = await Evaluation.findOrFail(params.id);
-        theEvaluation.name=body.name;
-        theEvaluation.email=body.email;
-        theEvaluation.passwords=body.passwords;
-        return theEvaluation.save();
+        const theProffesor = await Proffesor.findOrFail(params.id);
+        theProffesor.name=body.name;
+        theProffesor.email=body.email;
+        theProffesor.password=body.password;
+        return theProffesor.save();
     }
     /**
-     * Elimina a un Evaluation basado en el identificador
+     * Elimina a un Proffesor basado en el identificador
      */
     public async destroy({params}:HttpContextContract) {
-        const theEvaluation=await Evaluation.findOrFail(params.id);
-        return theEvaluation.delete();
+        const theProffesor=await Proffesor.findOrFail(params.id);
+        return theProffesor.delete();
     }
 }
