@@ -1,4 +1,3 @@
-import { Encryption } from '@adonisjs/core/build/standalone';
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Rubric from 'App/Models/Rubric'
 
