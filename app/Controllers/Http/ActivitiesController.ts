@@ -42,9 +42,11 @@ export default class ActivitiesController {
     theActivity.description = body.description;
     theActivity.start_date = body.start_date;
     theActivity.end_date = body.end_date;
-    theActivity.subject = body.subject_id;
-    return theActivity.save();
+    theActivity.subject_id = body.subject_id; // Aquí está el cambio
+    await theActivity.save(); // Agregue 'await' aquí para asegurarse de que se guarde antes de devolverlo
+    return theActivity;
   }
+
 
   /**
    * Elimina una actividad basada en el identificador

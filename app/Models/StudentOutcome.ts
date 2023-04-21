@@ -4,6 +4,8 @@ import Subject from './Subject'
 import Leader from './Leader'
 
 export default class StudentOutcome extends BaseModel {
+  public static table = 'students_outcomes'
+
   @column({ isPrimary: true })
   public id: number
 

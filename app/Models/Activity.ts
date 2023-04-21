@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, HasOne, column, hasOne } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
 import Subject from './Subject'
 
 export default class Activity extends BaseModel {
@@ -21,10 +21,10 @@ export default class Activity extends BaseModel {
   @column()
   public subject_id: number
 
-  @hasOne(() => Subject, {
+  @belongsTo(() => Subject, {
     foreignKey: 'subject_id',
   })
-  public subject: HasOne<typeof Subject>
+  public subject: BelongsTo<typeof Subject>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
