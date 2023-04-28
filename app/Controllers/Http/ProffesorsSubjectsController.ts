@@ -1,53 +1,69 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import ProffesorSubject from 'App/Models/ProffesorSubject'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import ProffesorSubject from 'App/Models/ProffesorSubject';
 
 export default class ProffesorSubjectsController {
-  /**
-   * Lista todos los ProffesorSubjects
-   */
-  public async index(ctx: HttpContextContract) {
-    return ProffesorSubject.all()
+  public async index({ response }: HttpContextContract) {
+    try {
+      const proffesorSubjects = await ProffesorSubject.all();
+      response.status(200).json({
+        message: 'Lista de ProffesorSubjects obtenida exitosamente.',
+        data: proffesorSubjects
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de ProffesorSubjects.' });
+    }
   }
 
-  /**
-   * Almacena la información de un ProffesorSubject
-   */
-  public async store({ request }: HttpContextContract) {
-    const body = request.body()
-
-    body.proffesor_id = body.proffesor_id
-    body.subject_id = body.subject_id
-
-    const newProffesorSubject = await ProffesorSubject.create(body)
-    return newProffesorSubject
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['proffesor_id', 'subject_id']);
+      const proffesorSubject = await ProffesorSubject.create(data);
+      response.status(201).json({
+        message: 'ProffesorSubject creado exitosamente.',
+        data: proffesorSubject
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el ProffesorSubject.' });
+    }
   }
 
-  /**
-   * Muestra la información de un solo ProffesorSubject
-   */
-  public async show({ params }: HttpContextContract) {
-    return ProffesorSubject.findOrFail(params.id)
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const proffesorSubject = await ProffesorSubject.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del ProffesorSubject obtenida exitosamente.',
+        data: proffesorSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'ProffesorSubject no encontrado' });
+    }
   }
 
-  /**
-   * Actualiza la información de un ProffesorSubject basado
-   * en los identificadores y nuevos parámetros
-   */
-  public async update({ params, request }: HttpContextContract) {
-    const body = request.body()
-    const theProffesorSubject = await ProffesorSubject.findOrFail(params.id)
-
-    theProffesorSubject.proffesor_id = body.proffesor_id
-    theProffesorSubject.subject_id = body.subject_id
-
-    return theProffesorSubject.save()
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const proffesorSubject = await ProffesorSubject.findOrFail(params.id);
+      const data = request.only(['proffesor_id', 'subject_id']);
+      proffesorSubject.merge(data);
+      await proffesorSubject.save();
+      response.status(200).json({
+        message: 'ProffesorSubject actualizado exitosamente.',
+        data: proffesorSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'ProffesorSubject no encontrado' });
+    }
   }
 
-  /**
-   * Elimina a un ProffesorSubject basado en los identificadores
-   */
-  public async destroy({ params }: HttpContextContract) {
-    const theProffesorSubject = await ProffesorSubject.findOrFail(params.id)
-    return theProffesorSubject.delete()
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const proffesorSubject = await ProffesorSubject.findOrFail(params.id);
+      await proffesorSubject.delete();
+      response.status(200).json({
+        message: 'ProffesorSubject eliminado exitosamente.',
+        data: proffesorSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'ProffesorSubject no encontrado' });
+    }
   }
 }

@@ -1,57 +1,69 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import StudentsOutcome from 'App/Models/StudentOutcome'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import StudentsOutcome from 'App/Models/StudentOutcome';
 
 export default class StudentsOutcomesController {
-  /**
-   * Lista todos los StudentsOutcomes
-   */
-  public async index(ctx: HttpContextContract) {
-    return StudentsOutcome.all()
+  public async index({ response }: HttpContextContract) {
+    try {
+      const studentsOutcomes = await StudentsOutcome.all();
+      response.status(200).json({
+        message: 'Lista de StudentsOutcomes obtenida exitosamente.',
+        data: studentsOutcomes
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de StudentsOutcomes.' });
+    }
   }
 
-  /**
-   * Almacena la información de un StudentsOutcome
-   */
-  public async store({ request }: HttpContextContract) {
-    const body = request.body()
-
-    body.name = body.name
-    body.description = body.description
-    body.grade = body.grade
-    body.id_leader = body.id_leader
-
-    const newStudentsOutcome = await StudentsOutcome.create(body)
-    return newStudentsOutcome
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'description', 'grade', 'id_leader']);
+      const studentsOutcome = await StudentsOutcome.create(data);
+      response.status(201).json({
+        message: 'StudentsOutcome creado exitosamente.',
+        data: studentsOutcome
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el StudentsOutcome.' });
+    }
   }
 
-  /**
-   * Muestra la información de un solo StudentsOutcome
-   */
-  public async show({ params }: HttpContextContract) {
-    return StudentsOutcome.findOrFail(params.id)
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const studentsOutcome = await StudentsOutcome.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del StudentsOutcome obtenida exitosamente.',
+        data: studentsOutcome
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'StudentsOutcome no encontrado.' });
+    }
   }
 
-  /**
-   * Actualiza la información de un StudentsOutcome basado
-   * en el identificador y nuevos parámetros
-   */
-  public async update({ params, request }: HttpContextContract) {
-    const body = request.body()
-    const theStudentsOutcome = await StudentsOutcome.findOrFail(params.id)
-
-    theStudentsOutcome.name = body.name
-    theStudentsOutcome.description = body.description
-    theStudentsOutcome.grade = body.grade
-    theStudentsOutcome.id_leader = body.id_leader
-
-    return theStudentsOutcome.save()
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const studentsOutcome = await StudentsOutcome.findOrFail(params.id);
+      const data = request.only(['name', 'description', 'grade', 'id_leader']);
+      studentsOutcome.merge(data);
+      await studentsOutcome.save();
+      response.status(200).json({
+        message: 'StudentsOutcome actualizado exitosamente.',
+        data: studentsOutcome
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'StudentsOutcome no encontrado.' });
+    }
   }
 
-  /**
-   * Elimina a un StudentsOutcome basado en el identificador
-   */
-  public async destroy({ params }: HttpContextContract) {
-    const theStudentsOutcome = await StudentsOutcome.findOrFail(params.id)
-    return theStudentsOutcome.delete()
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const studentsOutcome = await StudentsOutcome.findOrFail(params.id);
+      await studentsOutcome.delete();
+      response.status(200).json({
+        message: 'StudentsOutcome eliminado exitosamente.',
+        data: studentsOutcome
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'StudentsOutcome no encontrado.' });
+    }
   }
 }

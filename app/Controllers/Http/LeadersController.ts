@@ -1,49 +1,69 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Leader from 'App/Models/Leader'
-
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Leader from 'App/Models/Leader';
 
 export default class LeadersController {
-    /**
-     * Lista todos los Leaders
-     */
-    public async index(ctx: HttpContextContract) {
-        return Leader.all();
+  public async index({ response }: HttpContextContract) {
+    try {
+      const leaders = await Leader.all();
+      response.status(200).json({
+        message: 'Lista de líderes obtenida exitosamente.',
+        data: leaders
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de líderes.' });
     }
-    /**
-     * Almacena la información de un Leader
-     */
-    public async store({request}:HttpContextContract){
-        const body=request.body();
-        //Si se tiene un nombre, sobreescribe la información
-        body.name = body.name;
-        body.email = body.email;
-        body.password = body.password;
-        const newLeader = await Leader.create(body);
-        return newLeader;
+  }
+
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'email', 'password']);
+      const leader = await Leader.create(data);
+      response.status(201).json({
+        message: 'Líder creado exitosamente.',
+        data: leader
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el líder.' });
     }
-    /**
-     * Muestra la información de un solo Leader
-     */
-    public async show({params}:HttpContextContract) {
-        return Leader.findOrFail(params.id);
+  }
+
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const leader = await Leader.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del líder obtenida exitosamente.',
+        data: leader
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Líder no encontrado' });
     }
-    /**
-     * Actualiza la información de un Leader basado
-     * en el identificador y nuevos parámetros
-     */
-    public async update({params,request}:HttpContextContract) {
-        const body=request.body();
-        const theLeader = await Leader.findOrFail(params.id);
-        theLeader.name=body.name;
-        theLeader.email=body.email;
-        theLeader.password=body.password;
-        return theLeader.save();
+  }
+
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const leader = await Leader.findOrFail(params.id);
+      const data = request.only(['name', 'email', 'password']);
+      leader.merge(data);
+      await leader.save();
+      response.status(200).json({
+        message: 'Líder actualizado exitosamente.',
+        data: leader
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Líder no encontrado' });
     }
-    /**
-     * Elimina a un Leader basado en el identificador
-     */
-    public async destroy({params}:HttpContextContract) {
-        const theLeader=await Leader.findOrFail(params.id);
-        return theLeader.delete();
+  }
+
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const leader = await Leader.findOrFail(params.id);
+      await leader.delete();
+      response.status(200).json({
+        message: 'Líder eliminado exitosamente.',
+        data: leader
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Líder no encontrado' });
     }
+  }
 }

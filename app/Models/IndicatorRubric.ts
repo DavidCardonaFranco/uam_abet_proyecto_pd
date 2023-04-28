@@ -18,5 +18,4 @@ export default class IndicatorRubric extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
-  subject_id: any
 }

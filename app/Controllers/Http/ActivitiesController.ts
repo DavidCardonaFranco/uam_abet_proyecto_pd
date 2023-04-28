@@ -1,58 +1,70 @@
-// import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Activity from 'App/Models/Activity';
 
 export default class ActivitiesController {
-  /**
-   * Lista todas las actividades
-   */
-  public async index({}: HttpContextContract) {
-    return Activity.all();
+  public async index({ response }: HttpContextContract) {
+    try {
+      const activities = await Activity.query().preload('subject');
+      response.status(200).json({
+        message: 'Lista de actividades obtenida exitosamente.',
+        data: activities
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de actividades.' });
+    }
   }
 
-  /**
-   * Almacena la información de una actividad
-   */
-  public async store({ request }: HttpContextContract) {
-    const body = request.body();
-    body.name = body.name;
-    body.description = body.description;
-    body.start_date = body.start_date;
-    body.end_date = body.end_date;
-    body.subject_id = body.subject_id;
-    const newActivity = await Activity.create(body);
-    return newActivity;
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'description', 'start_date', 'end_date', 'subject_id']);
+      const activity = await Activity.create(data);
+      response.status(201).json({
+        message: 'Actividad creada exitosamente.',
+        data: activity
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear la actividad.' });
+    }
   }
 
-  /**
-   * Muestra la información de una sola actividad
-   */
-  public async show({ params }: HttpContextContract) {
-    return Activity.findOrFail(params.id);
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const activity = await Activity.findOrFail(params.id);
+      await activity.preload('subject');
+      response.status(200).json({
+        message: 'Información de la actividad obtenida exitosamente.',
+        data: activity
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Actividad no encontrada' });
+    }
   }
 
-  /**
-   * Actualiza la información de una actividad basada
-   * en el identificador y nuevos parámetros
-   */
-  public async update({ params, request }: HttpContextContract) {
-    const body = request.body();
-    const theActivity = await Activity.findOrFail(params.id);
-    theActivity.name = body.name;
-    theActivity.description = body.description;
-    theActivity.start_date = body.start_date;
-    theActivity.end_date = body.end_date;
-    theActivity.subject_id = body.subject_id; // Aquí está el cambio
-    await theActivity.save(); // Agregue 'await' aquí para asegurarse de que se guarde antes de devolverlo
-    return theActivity;
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const activity = await Activity.findOrFail(params.id);
+      const data = request.only(['name', 'description', 'start_date', 'end_date', 'subject_id']);
+      activity.merge(data);
+      await activity.save();
+      response.status(200).json({
+        message: 'Actividad actualizada exitosamente.',
+        data: activity
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Actividad no encontrada' });
+    }
   }
 
-
-  /**
-   * Elimina una actividad basada en el identificador
-   */
-  public async destroy({ params }: HttpContextContract) {
-    const theActivity = await Activity.findOrFail(params.id);
-    return theActivity.delete();
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const activity = await Activity.findOrFail(params.id);
+      await activity.delete();
+      response.status(200).json({
+        message: 'Actividad eliminada exitosamente.',
+        data: activity
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Actividad no encontrada' });
+    }
   }
 }

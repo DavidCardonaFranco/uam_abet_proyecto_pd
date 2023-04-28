@@ -1,51 +1,69 @@
-
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Subject from 'App/Models/Subject'
-
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Subject from 'App/Models/Subject';
 
 export default class SubjectsController {
-    /**
-     * Lista todos los Subjects
-     */
-    public async index(ctx: HttpContextContract) {
-        return Subject.all();
+  public async index({ response }: HttpContextContract) {
+    try {
+      const subjects = await Subject.all();
+      response.status(200).json({
+        message: 'Lista de Subjects obtenida exitosamente.',
+        data: subjects
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de Subjects.' });
     }
-    /**
-     * Almacena la información de un Subject
-     */
-    public async store({request}:HttpContextContract){
-        const body=request.body();
-        //Si se tiene un nombre, sobreescribe la información
-        body.code = body.code;
-        body.name = body.name;
-        body.description = body.description;
-        body.credits = body.credits;
-        const newSubject = await Subject.create(body);
-        return newSubject;
+  }
+
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['code', 'name', 'description', 'credits']);
+      const subject = await Subject.create(data);
+      response.status(201).json({
+        message: 'Subject creado exitosamente.',
+        data: subject
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el Subject.' });
     }
-    /**
-     * Muestra la información de un solo Subject
-     */
-    public async show({params}:HttpContextContract) {
-        return Subject.findOrFail(params.code);
+  }
+
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const subject = await Subject.findOrFail(params.code);
+      response.status(200).json({
+        message: 'Información del Subject obtenida exitosamente.',
+        data: subject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Subject no encontrado.' });
     }
-    /**
-     * Actualiza la información de un Subject basado
-     * en el codeentificador y nuevos parámetros
-     */
-    public async update({params,request}:HttpContextContract) {
-        const body=request.body();
-        const theSubject = await Subject.findOrFail(params.code);
-        theSubject.name=body.name;
-        theSubject.description=body.description;
-        theSubject.credits=body.credits;
-        return theSubject.save();
+  }
+
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const subject = await Subject.findOrFail(params.code);
+      const data = request.only(['name', 'description', 'credits']);
+      subject.merge(data);
+      await subject.save();
+      response.status(200).json({
+        message: 'Subject actualizado exitosamente.',
+        data: subject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Subject no encontrado.' });
     }
-    /**
-     * Elimina a un Subject basado en el codeentificador
-     */
-    public async destroy({params}:HttpContextContract) {
-        const theSubject=await Subject.findOrFail(params.code);
-        return theSubject.delete();
+  }
+
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const subject = await Subject.findOrFail(params.code);
+      await subject.delete();
+      response.status(200).json({
+        message: 'Subject eliminado exitosamente.',
+        data: subject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Subject no encontrado.' });
     }
+  }
 }

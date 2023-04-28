@@ -1,49 +1,69 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Rubric from 'App/Models/Rubric'
-
+import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Rubric from 'App/Models/Rubric';
 
 export default class RubricsController {
+  public async index({ response }: HttpContextContract) {
+    try {
+      const rubrics = await Rubric.all();
+      response.status(200).json({
+        message: 'Lista de Rubrics obtenida exitosamente.',
+        data: rubrics
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de Rubrics.' });
+    }
+  }
 
-    /**
-     * Lista todos los Rubrics
-     */
-    public async index(ctx:HttpContextContract){
-        return Rubric.all();
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'description']);
+      const rubric = await Rubric.create(data);
+      response.status(201).json({
+        message: 'Rubric creado exitosamente.',
+        data: rubric
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el Rubric.' });
     }
-    /**
-     * Almacena la información de un Rubric
-     */
-    public async store({request}:HttpContextContract){
-        const body=request.body();
-        //Si se tiene un nombre, sobreescribe la información
-        body.name = body.name;
-        body.description = body.description;
-        const newRubric = await Rubric.create(body);
-        return newRubric;
+  }
+
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const rubric = await Rubric.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del Rubric obtenida exitosamente.',
+        data: rubric
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Rubric no encontrado' });
     }
-    /**
-     * Muestra la información de un solo Rubric
-     */
-    public async show({params}:HttpContextContract) {
-        return Rubric.findOrFail(params.id);
+  }
+
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const rubric = await Rubric.findOrFail(params.id);
+      const data = request.only(['name', 'description']);
+      rubric.merge(data);
+      await rubric.save();
+      response.status(200).json({
+        message: 'Rubric actualizado exitosamente.',
+        data: rubric
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Rubric no encontrado' });
     }
-    /**
-     * Actualiza la información de un Rubric basado
-     * en el identificador y nuevos parámetros
-     */
-    public async update({params,request}:HttpContextContract) {
-        const body=request.body();
-        const theRubric = await Rubric.findOrFail(params.id);
-        theRubric.name=body.name;
-        theRubric.description=body.description;
-        return theRubric.save();
+  }
+
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const rubric = await Rubric.findOrFail(params.id);
+      await rubric.delete();
+      response.status(200).json({
+        message: 'Rubric eliminado exitosamente.',
+        data: rubric
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Rubric no encontrado' });
     }
-    /**
-     * Elimina a un Rubric basado en el identificador
-     */
-    public async destroy({params}:HttpContextContract) {
-        const theRubric=await Rubric.findOrFail(params.id);
-        return theRubric.delete();
-    }
+  }
 }
-

@@ -1,57 +1,69 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Indicator from 'App/Models/Indicator'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Indicator from 'App/Models/Indicator';
 
 export default class IndicatorsController {
-  /**
-   * Lista todos los Indicators
-   */
-  public async index(ctx: HttpContextContract) {
-    return Indicator.all()
+  public async index({ response }: HttpContextContract) {
+    try {
+      const indicators = await Indicator.all();
+      response.status(200).json({
+        message: 'Lista de indicadores obtenida exitosamente.',
+        data: indicators
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de indicadores.' });
+    }
   }
 
-  /**
-   * Almacena la información de un Indicator
-   */
-  public async store({ request }: HttpContextContract) {
-    const body = request.body()
-
-    body.name = body.name
-    body.expected_value = body.expected_value
-    body.real_value = body.real_value
-    body.id_outcome = body.id_outcome
-
-    const newIndicator = await Indicator.create(body)
-    return newIndicator
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'expected_value', 'real_value', 'id_outcome']);
+      const indicator = await Indicator.create(data);
+      response.status(201).json({
+        message: 'Indicador creado exitosamente.',
+        data: indicator
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el indicador.' });
+    }
   }
 
-  /**
-   * Muestra la información de un solo Indicator
-   */
-  public async show({ params }: HttpContextContract) {
-    return Indicator.findOrFail(params.id)
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const indicator = await Indicator.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del indicador obtenida exitosamente.',
+        data: indicator
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Indicador no encontrado' });
+    }
   }
 
-  /**
-   * Actualiza la información de un Indicator basado
-   * en el identificador y nuevos parámetros
-   */
-  public async update({ params, request }: HttpContextContract) {
-    const body = request.body()
-    const theIndicator = await Indicator.findOrFail(params.id)
-
-    theIndicator.name = body.name
-    theIndicator.expected_value = body.expected_value
-    theIndicator.real_value = body.real_value
-    theIndicator.id_outcome = body.id_outcome
-
-    return theIndicator.save()
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const indicator = await Indicator.findOrFail(params.id);
+      const data = request.only(['name', 'expected_value', 'real_value', 'id_outcome']);
+      indicator.merge(data);
+      await indicator.save();
+      response.status(200).json({
+        message: 'Indicador actualizado exitosamente.',
+        data: indicator
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Indicador no encontrado' });
+    }
   }
 
-  /**
-   * Elimina a un Indicator basado en el identificador
-   */
-  public async destroy({ params }: HttpContextContract) {
-    const theIndicator = await Indicator.findOrFail(params.id)
-    return theIndicator.delete()
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const indicator = await Indicator.findOrFail(params.id);
+      await indicator.delete();
+      response.status(200).json({
+        message: 'Indicador eliminado exitosamente.',
+        data: indicator
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Indicador no encontrado' });
+    }
   }
 }

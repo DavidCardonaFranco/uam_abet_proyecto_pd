@@ -1,49 +1,69 @@
-import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import Proffesor from 'App/Models/Proffesor'
-
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Proffesor from 'App/Models/Proffesor';
 
 export default class ProffesorsController {
-    /**
-     * Lista todos los Proffesors
-     */
-    public async index(ctx: HttpContextContract) {
-        return Proffesor.all();
+  public async index({ response }: HttpContextContract) {
+    try {
+      const proffesors = await Proffesor.all();
+      response.status(200).json({
+        message: 'Lista de Proffesors obtenida exitosamente.',
+        data: proffesors
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de Proffesors.' });
     }
-    /**
-     * Almacena la información de un Proffesor
-     */
-    public async store({request}:HttpContextContract){
-        const body=request.body();
-        //Si se tiene un nombre, sobreescribe la información
-        body.name = body.name;
-        body.email = body.email;
-        body.password = body.password;
-        const newProffesor = await Proffesor.create(body);
-        return newProffesor;
+  }
+
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['name', 'email', 'password']);
+      const proffesor = await Proffesor.create(data);
+      response.status(201).json({
+        message: 'Proffesor creado exitosamente.',
+        data: proffesor
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el Proffesor.' });
     }
-    /**
-     * Muestra la información de un solo Proffesor
-     */
-    public async show({params}:HttpContextContract) {
-        return Proffesor.findOrFail(params.id);
+  }
+
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const proffesor = await Proffesor.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del Proffesor obtenida exitosamente.',
+        data: proffesor
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Proffesor no encontrado' });
     }
-    /**
-     * Actualiza la información de un Proffesor basado
-     * en el identificador y nuevos parámetros
-     */
-    public async update({params,request}:HttpContextContract) {
-        const body=request.body();
-        const theProffesor = await Proffesor.findOrFail(params.id);
-        theProffesor.name=body.name;
-        theProffesor.email=body.email;
-        theProffesor.password=body.password;
-        return theProffesor.save();
+  }
+
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const proffesor = await Proffesor.findOrFail(params.id);
+      const data = request.only(['name', 'email', 'password']);
+      proffesor.merge(data);
+      await proffesor.save();
+      response.status(200).json({
+        message: 'Proffesor actualizado exitosamente.',
+        data: proffesor
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Proffesor no encontrado' });
     }
-    /**
-     * Elimina a un Proffesor basado en el identificador
-     */
-    public async destroy({params}:HttpContextContract) {
-        const theProffesor=await Proffesor.findOrFail(params.id);
-        return theProffesor.delete();
+  }
+
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const proffesor = await Proffesor.findOrFail(params.id);
+      await proffesor.delete();
+      response.status(200).json({
+        message: 'Proffesor eliminado exitosamente.',
+        data: proffesor
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'Proffesor no encontrado' });
     }
+  }
 }

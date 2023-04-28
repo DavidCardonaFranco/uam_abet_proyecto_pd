@@ -1,53 +1,69 @@
-import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import OutcomeSubject from 'App/Models/OutcomeSubject'
+import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import OutcomeSubject from 'App/Models/OutcomeSubject';
 
 export default class OutcomeSubjectsController {
-  /**
-   * Lista todos los OutcomeSubjects
-   */
-  public async index(ctx: HttpContextContract) {
-    return OutcomeSubject.all()
+  public async index({ response }: HttpContextContract) {
+    try {
+      const outcomeSubjects = await OutcomeSubject.all();
+      response.status(200).json({
+        message: 'Lista de OutcomeSubjects obtenida exitosamente.',
+        data: outcomeSubjects
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al obtener la lista de OutcomeSubjects.' });
+    }
   }
 
-  /**
-   * Almacena la información de un OutcomeSubject
-   */
-  public async store({ request }: HttpContextContract) {
-    const body = request.body()
-
-    body.id_outcome = body.id_outcome
-    body.subject_id = body.subject_id
-
-    const newOutcomeSubject = await OutcomeSubject.create(body)
-    return newOutcomeSubject
+  public async store({ request, response }: HttpContextContract) {
+    try {
+      const data = request.only(['id_outcome', 'subject_id']);
+      const outcomeSubject = await OutcomeSubject.create(data);
+      response.status(201).json({
+        message: 'OutcomeSubject creado exitosamente.',
+        data: outcomeSubject
+      });
+    } catch (error) {
+      response.status(500).json({ message: 'Error al crear el OutcomeSubject.' });
+    }
   }
 
-  /**
-   * Muestra la información de un solo OutcomeSubject
-   */
-  public async show({ params }: HttpContextContract) {
-    return OutcomeSubject.findOrFail(params.id)
+  public async show({ params, response }: HttpContextContract) {
+    try {
+      const outcomeSubject = await OutcomeSubject.findOrFail(params.id);
+      response.status(200).json({
+        message: 'Información del OutcomeSubject obtenida exitosamente.',
+        data: outcomeSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'OutcomeSubject no encontrado' });
+    }
   }
 
-  /**
-   * Actualiza la información de un OutcomeSubject basado
-   * en el identificador y nuevos parámetros
-   */
-  public async update({ params, request }: HttpContextContract) {
-    const body = request.body()
-    const theOutcomeSubject = await OutcomeSubject.findOrFail(params.id)
-
-    theOutcomeSubject.id_outcome = body.id_outcome
-    theOutcomeSubject.subject_id = body.subject_id
-
-    return theOutcomeSubject.save()
+  public async update({ request, params, response }: HttpContextContract) {
+    try {
+      const outcomeSubject = await OutcomeSubject.findOrFail(params.id);
+      const data = request.only(['id_outcome', 'subject_id']);
+      outcomeSubject.merge(data);
+      await outcomeSubject.save();
+      response.status(200).json({
+        message: 'OutcomeSubject actualizado exitosamente.',
+        data: outcomeSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'OutcomeSubject no encontrado' });
+    }
   }
 
-  /**
-   * Elimina a un OutcomeSubject basado en el identificador
-   */
-  public async destroy({ params }: HttpContextContract) {
-    const theOutcomeSubject = await OutcomeSubject.findOrFail(params.id)
-    return theOutcomeSubject.delete()
+  public async destroy({ params, response }: HttpContextContract) {
+    try {
+      const outcomeSubject = await OutcomeSubject.findOrFail(params.id);
+      await outcomeSubject.delete();
+      response.status(200).json({
+        message: 'OutcomeSubject eliminado exitosamente.',
+        data: outcomeSubject
+      });
+    } catch (error) {
+      response.status(404).json({ message: 'OutcomeSubject no encontrado' });
+    }
   }
 }
